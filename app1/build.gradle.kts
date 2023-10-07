@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktor_version: String by project
 val kotlin_version: String by project
@@ -15,16 +16,11 @@ plugins {
 group = "com.example"
 version = "0.0.1"
 
-application {
-    mainClass.set("io.ktor.server.netty.EngineMain")
-
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
-}
-
 repositories {
     mavenCentral()
 }
+
+val opentelemetry by configurations.creating
 
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm")
@@ -44,4 +40,35 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml:2.3.5")
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-ktor-2.0:1.30.0-alpha")
+    opentelemetry("io.opentelemetry.javaagent:opentelemetry-javaagent:1.20.2")
+}
+
+application {
+    mainClass.set("io.ktor.server.netty.EngineMain")
+    val isDevelopment: Boolean = project.ext.has("development")
+    applicationDefaultJvmArgs = listOf(
+        "-Dio.ktor.development=$isDevelopment",
+        "-javaagent:$buildDir/otel/otel-javaagent.jar",
+        "-Dotel.service.name=ktor-opentelemetry",
+        "-Dotel.exporter.otlp.endpoint=http://localhost:4317",
+        "-Dotel.logs.exporter=otlp"
+    )
+}
+
+val otelAgent = tasks.register<Copy>("otel-agent") {
+    from(opentelemetry) {
+        rename { "otel-javaagent.jar" }
+    }
+    into(file("$buildDir/otel/"))
+}
+
+tasks {
+    buildFatJar {
+        dependsOn(otelAgent)
+    }
+}
+
+tasks {
+    getByName("run").dependsOn(otelAgent)
 }
