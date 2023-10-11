@@ -25,31 +25,6 @@ services:
       - "4318:4318"     # Collector - OTLP HTTP
     volumes:
       - jaeger_data:/badger
-
-  app1:
-    build: ./app1/
-    environment:
-      OTEL_SERVICE_NAME: "ktor-app1"
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaegertracing:4317"
-      # Logs are disabled by default
-      OTEL_LOGS_EXPORTER: "otlp"
-    ports:
-      - "8080:8080"
-    depends_on:
-      - jaegertracing
-      - app2
-
-  app2:
-    build: ./app2/
-    environment:
-      OTEL_SERVICE_NAME: "ktor-app2"
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaegertracing:4317"
-      # Logs are disabled by default
-      OTEL_LOGS_EXPORTER: "otlp"
-    ports:
-      - "8081:8080"
-    depends_on:
-      - jaegertracing
-
+      
 volumes:
-  jaeger_data: {}
+  jaeger_data:

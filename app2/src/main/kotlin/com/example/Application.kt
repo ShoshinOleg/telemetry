@@ -1,7 +1,9 @@
 package com.example
 
 import com.example.plugins.*
+import com.example.plugins.telemetry.configureTelemetry
 import io.ktor.server.application.*
+import io.opentelemetry.api.GlobalOpenTelemetry
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
@@ -9,7 +11,9 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
     configureSerialization()
-    configureDatabases()
-    configureMonitoring()
-    configureRouting()
+    val otel = GlobalOpenTelemetry.get()
+    configureTelemetry(otel)
+//    configureDatabases()
+//    configureMonitoring()
+    configureRouting(otel)
 }

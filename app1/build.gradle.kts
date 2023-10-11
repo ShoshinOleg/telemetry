@@ -40,8 +40,15 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml:2.3.5")
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    // ---
+    // Telemetry
     implementation("io.opentelemetry.instrumentation:opentelemetry-ktor-2.0:1.30.0-alpha")
     opentelemetry("io.opentelemetry.javaagent:opentelemetry-javaagent:1.20.2")
+    // ---
+    // Ktor-client
+    implementation("io.ktor:ktor-client-core:$ktor_version")
+    implementation("io.ktor:ktor-client-cio:$ktor_version")
+    implementation("io.ktor:ktor-client-logging:$ktor_version")
 }
 
 application {
