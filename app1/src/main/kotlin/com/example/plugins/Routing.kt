@@ -57,7 +57,7 @@ fun Application.configureRouting(otel: OpenTelemetry) {
                     logger.info("dispatched to ${Thread.currentThread().name}")
                     tracer.trace("call app2") { app2Span ->
                         delay(delayTime)
-                        val response = client.get("http://app2/")
+                        val response = client.get("http://app2:8080/")
                         it.addEvent("app2 response = $response")
 //                        client.request("https://ktor.io/")
                         app2Span.setStatus(StatusCode.OK)
